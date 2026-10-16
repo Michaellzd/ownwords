@@ -136,3 +136,11 @@ See [the publishing guide](docs/chrome-web-store.md) for packaging, listing cont
 ## Say hello
 
 Built by [Michael Lu](https://x.com/michael_lu_03). Welcome to follow me on X for updates and conversations about building indie projects.
+
+## More products
+
+Explore my other products:
+
+- [AI Takeaway](https://aitakeaway.net/)
+- [Auralume AI](https://auralumeai.com/)
+- [Encorette](https://burningbridgesmv.org/)
