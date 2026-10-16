@@ -4,20 +4,29 @@ import { mkdtemp, rm, mkdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { LANGUAGES } from '../src/languages.js';
+import { translate } from '../src/i18n.js';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const profile = await mkdtemp(path.join(tmpdir(), 'x-draft-test-'));
+const profile = await mkdtemp(path.join(tmpdir(), 'ownwords-test-'));
 await mkdir(path.join(root, 'artifacts'), { recursive: true });
 const context = await chromium.launchPersistentContext(profile, {
   channel: 'chromium', headless: true,
   args: [`--disable-extensions-except=${root}`, `--load-extension=${root}`],
   viewport: { width: 400, height: 900 },
+  locale: 'zh-CN',
 });
 const errors = [];
 const requests = [];
 let mode = 'success';
 const result = 'I’m not sure this is what people need.';
+const outputs = { English: result, 'Simplified Chinese': '我不确定这是不是大家需要的。', Japanese: 'これが本当に必要とされているのか、まだわかりません。', Korean: '사람들이 정말 필요로 하는 건지 잘 모르겠어요.', Spanish: 'No estoy seguro de que esto sea lo que la gente necesita.' };
 let releaseSlow;
+async function waitForSlowRequest() {
+  const deadline = Date.now() + 5000;
+  while (!releaseSlow && Date.now() < deadline) await new Promise((resolve) => setTimeout(resolve, 10));
+  assert.equal(typeof releaseSlow, 'function', 'The delayed API request must arrive within five seconds');
+}
 try {
   // Test-only permission lets assertions inspect the clipboard. The shipped
   // extension requests write access only and never reads the clipboard.
@@ -28,16 +37,22 @@ try {
   const behavior = await worker.evaluate(() => chrome.sidePanel.getPanelBehavior());
   assert.equal(behavior.openPanelOnActionClick, true);
   await context.route('https://openrouter.ai/api/v1/chat/completions', async (route) => {
-    requests.push({ headers: route.request().headers(), body: route.request().postDataJSON() });
-    if (mode === 'slow') await new Promise((resolve) => { releaseSlow = resolve; });
-    if (mode === 'error') return route.fulfill({ status: 402, contentType: 'application/json', body: JSON.stringify({ error: { message: 'SENSITIVE_SERVER_MESSAGE' } }) });
-    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ choices: [{ message: { content: result }, finish_reason: 'stop' }] }) }).catch(() => {});
+    const body = route.request().postDataJSON();
+    const requestMode = mode;
+    requests.push({ headers: route.request().headers(), body });
+    const target = /^Output language: (.+)\.$/m.exec(body.messages[0].content)?.[1];
+    assert(Object.hasOwn(outputs, target), 'An explicit supported output language is required');
+    if (requestMode === 'slow') await new Promise((resolve) => { releaseSlow = resolve; });
+    if (requestMode === 'error') return route.fulfill({ status: 402, contentType: 'application/json', body: JSON.stringify({ error: { message: 'SENSITIVE_SERVER_MESSAGE' } }) });
+    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ choices: [{ message: { content: outputs[target] }, finish_reason: 'stop' }] }) }).catch(() => {});
   });
   let page = await context.newPage();
   const observe = (p) => { p.on('pageerror', (error) => errors.push(error.message)); };
   observe(page);
   await page.goto(panelUrl);
   await page.locator('#settings:not([hidden])').waitFor();
+  assert.equal(await page.locator('html').getAttribute('lang'), 'zh-CN');
+  assert.equal(await page.locator('#output-language').inputValue(), 'en');
   assert.equal(await page.locator('#model-preset').inputValue(), 'anthropic/claude-haiku-5.5');
   assert.equal(await page.locator('#generate').isDisabled(), true);
   await page.locator('#api-key').fill('test-only-key');
@@ -97,8 +112,10 @@ try {
   console.log('PASS: preset switching and sanitized API errors preserve text');
 
   mode = 'slow';
+  releaseSlow = undefined;
   await page.locator('#generate').click();
   await page.locator('#cancel:not([hidden])').waitFor();
+  await waitForSlowRequest();
   await page.waitForFunction(() => document.getElementById('generate').disabled);
   await page.locator('#cancel').click();
   await page.waitForFunction(() => document.getElementById('status').textContent === '已取消。');
@@ -122,6 +139,99 @@ try {
   await page.setViewportSize({ width: 320, height: 900 });
   await page.screenshot({ path: path.join(root, 'artifacts/result-light-320.png'), fullPage: true });
   console.log('PASS: 320/400/660px layouts, light/dark modes, reduced motion');
+
+  const beforeLanguageSwitch = requests.length;
+  const previousDraft = await page.locator('#draft').inputValue();
+  const previousResult = await page.locator('#result').inputValue();
+  await page.locator('#settings-toggle').click();
+  await page.locator('#api-key').fill('unsaved-test-only-key');
+  for (const { code } of LANGUAGES) {
+    await page.locator('#ui-language').selectOption(code);
+    assert.equal(await page.locator('html').getAttribute('lang'), code);
+    assert.equal(await page.locator('#output-language').inputValue(), 'en');
+    assert.equal(await page.locator('#draft').inputValue(), previousDraft);
+    assert.equal(await page.locator('#result').inputValue(), previousResult);
+    assert.equal(await page.locator('#api-key').inputValue(), 'unsaved-test-only-key');
+    assert.equal(await page.locator('#key-toggle').getAttribute('aria-label'), translate(code, 'showKey'));
+    assert.equal(await page.locator('#stale-note').isVisible(), false);
+    for (const width of [320, 400]) {
+      await page.setViewportSize({ width, height: 900 });
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `${code} fits at ${width}px`);
+    }
+  }
+  assert.equal(requests.length, beforeLanguageSwitch);
+  await page.locator('#api-key').fill('test-only-key');
+  await page.locator('#settings-toggle').click();
+  console.log('PASS: all five interfaces switch without network calls, text loss, or overwritten unsaved credentials');
+
+  await page.locator('#ui-language').selectOption('es');
+  await page.locator('#output-language').selectOption('ja');
+  assert.equal(await page.locator('#stale-note').isVisible(), true);
+  assert.equal(await page.locator('#result').getAttribute('lang'), 'en');
+  await page.locator('input[value="grammar"]').check();
+  await page.locator('#generate').click();
+  await page.waitForFunction((expected) => document.getElementById('result').value === expected, outputs.Japanese);
+  assert.match(requests.at(-1).body.messages[0].content, /Output language: Japanese\./);
+  assert.match(requests.at(-1).body.messages[0].content, /including in Grammar only mode/);
+  assert.equal(await page.locator('html').getAttribute('lang'), 'es');
+  assert.equal(await page.locator('#result').getAttribute('lang'), 'ja');
+  assert.equal(await page.locator('#stale-note').isVisible(), false);
+  await page.locator('#copy').click();
+  assert.equal(await page.evaluate(() => navigator.clipboard.readText()), outputs.Japanese);
+  mode = 'error';
+  await page.locator('#generate').click();
+  await page.waitForFunction((expected) => document.getElementById('status').textContent === expected, translate('es', 'apiCredits'));
+  await page.locator('#ui-language').selectOption('ko');
+  assert.equal(await page.locator('#status').innerText(), translate('ko', 'apiCredits'));
+  assert.equal(await page.locator('#result').inputValue(), outputs.Japanese);
+  console.log('PASS: Spanish interface requests Japanese output; localized errors retranslate without changing the result');
+
+  await page.locator('#output-language').selectOption('es');
+  await page.waitForFunction(() => chrome.storage.local.get('preferences').then(({ preferences }) => preferences?.uiLanguage === 'ko' && preferences?.outputLanguage === 'es'));
+  await page.close();
+  page = await context.newPage();
+  observe(page);
+  await page.goto(panelUrl);
+  await page.waitForFunction(() => document.getElementById('ui-language').value === 'ko' && !document.getElementById('ui-language').disabled);
+  assert.equal(await page.locator('html').getAttribute('lang'), 'ko');
+  assert.equal(await page.locator('#output-language').inputValue(), 'es');
+  assert.equal(await page.locator('#result').inputValue(), outputs.Japanese);
+  assert.equal(await page.locator('#result').getAttribute('lang'), 'ja');
+  assert.equal(await page.locator('#stale-note').isVisible(), true);
+  assert.equal((await page.evaluate(() => chrome.storage.local.get('settings'))).settings.apiKey, 'test-only-key');
+  console.log('PASS: independent language preferences persist across reopening without changing credentials');
+
+  mode = 'slow';
+  await page.locator('#output-language').selectOption('ja');
+  const beforeSlowRequest = requests.length;
+  releaseSlow = undefined;
+  await page.locator('#generate').click();
+  await waitForSlowRequest();
+  assert.equal(requests.length, beforeSlowRequest + 1);
+  await page.locator('#output-language').selectOption('es');
+  releaseSlow();
+  await page.waitForFunction((expected) => document.getElementById('status').textContent === expected, translate('ko', 'generated'));
+  assert.equal(await page.locator('#result').getAttribute('lang'), 'ja');
+  assert.equal(await page.locator('#stale-note').isVisible(), true);
+  mode = 'success';
+  console.log('PASS: changing output language during a request marks the returned result stale');
+
+  for (const { code } of LANGUAGES) {
+    await page.locator('#ui-language').selectOption(code);
+    await page.locator('#output-language').selectOption(code);
+    await page.locator('#generate').click();
+    await page.waitForFunction((expected) => document.getElementById('status').textContent === expected && !document.getElementById('generate').disabled, translate(code, 'generated'));
+    assert.equal(await page.locator('#result').getAttribute('lang'), code);
+    assert.equal(await page.locator('#result').inputValue(), outputs[LANGUAGES.find((item) => item.code === code).promptName]);
+    await page.setViewportSize({ width: 320, height: 900 });
+    await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    await page.screenshot({ path: path.join(root, `artifacts/ownwords-${code}-320.png`), fullPage: true, animations: 'disabled' });
+  }
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.setViewportSize({ width: 520, height: 900 });
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  await page.screenshot({ path: path.join(root, 'artifacts/ownwords-es-dark-520.png'), fullPage: true, animations: 'disabled' });
+  console.log('PASS: all five output language prompts and translated UI layouts');
 
   await page.locator('#clear').click();
   assert.equal(await page.locator('#draft').inputValue(), '');

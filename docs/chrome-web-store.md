@@ -1,4 +1,4 @@
-# Publishing X Draft to the Chrome Web Store
+# Publishing OwnWords to the Chrome Web Store
 
 The source repository being public does not publish the extension to the store. The extension currently runs through **Load unpacked**. This guide prepares a later store submission; no submission has been made.
 
@@ -19,31 +19,31 @@ npm run test:browser
 npm run package
 ```
 
-Upload `dist/x-draft-0.1.0.zip`. `manifest.json` is at the ZIP root. The archive contains only runtime files and the license. Do not upload `.git`, `node_modules`, browser profiles, tests, screenshots containing keys, or environment files.
+Upload `dist/ownwords-0.2.0.zip`. `manifest.json` is at the ZIP root. The archive contains runtime files, all language packs, and the license. Do not upload `.git`, `node_modules`, browser profiles, tests, screenshots containing keys, or environment files.
 
 Before submission, do one live rewrite with your own key for each preset you intend to advertise. Automated tests mock responses and do not verify current model access, billing, response quality, or service availability. Remove your key before capturing screenshots.
 
 ## 3. Prepare the listing
 
-Suggested name: **X Draft**
+Suggested name: **OwnWords**
 
 Suggested short description:
 
-> Rewrite rough drafts into natural English without leaving the conversation. Bring your own OpenRouter key and model.
+> Your own thoughts, expressed clearly. Improve your drafts in your chosen language, beside any website. Use your own OpenRouter key.
 
 Suggested detailed description:
 
-> X Draft is a small side-panel editor for non-native English speakers writing posts and replies on X. Paste a draft in English, Chinese, or a mixture. Choose Natural, Concise, or Grammar only, then edit and copy the result.
+> OwnWords helps you express your own thoughts clearly in replies, comments, posts, and messages across the browser. Write your own draft first, then choose Natural, Concise, or Grammar only to improve its expression while keeping your meaning and voice. Input can be in any language or a mixture.
 >
-> Use your own OpenRouter API key and model ID. Claude Haiku 5.5 and GPT-6 Luna are included as shortcuts, and custom model IDs are supported. API usage is billed by OpenRouter. The interface is currently in Simplified Chinese.
+> Choose English, Simplified Chinese, Japanese, Korean, or Spanish independently for the interface and output. Use your own OpenRouter API key and model ID. Claude Haiku 5.5 and GPT-6 Luna are included as shortcuts, and custom model IDs are supported. API usage is billed by OpenRouter.
 >
-> X Draft does not read the current page, access your X account, or publish posts. Your key is stored locally in your browser profile. Drafts and results are kept only for the browser session. Submitted drafts and optional context are sent directly to OpenRouter and your chosen model provider when you generate.
+> OwnWords does not read the current page, access your website accounts, or publish posts. Your key and language choices are stored locally in your browser profile. Drafts and results are kept only for the browser session. Submitted drafts and optional context are sent directly to OpenRouter and your chosen model provider when you request a rewrite.
 
 Choose the category and listing language that match the final product. Capture authentic screenshots of the installed side panel using example text. Include the empty editor, settings with a masked or absent key, and a completed rewrite. Follow the dashboard's current image dimensions and asset requirements; repository test screenshots are QA evidence, not automatically store-ready artwork.
 
-Support URL: `https://github.com/Michaellzd/x-draft/issues`
+Support URL: `https://github.com/Michaellzd/ownwords/issues`
 
-Privacy policy URL: `https://github.com/Michaellzd/x-draft/blob/main/PRIVACY.md`
+Privacy policy URL: `https://github.com/Michaellzd/ownwords/blob/main/PRIVACY.md`
 
 Confirm the privacy link is publicly readable while signed out. A dedicated hosted policy page can replace it later if required by the dashboard or review.
 
@@ -53,7 +53,7 @@ Read [Google's privacy-fields guide](https://developer.chrome.com/docs/webstore/
 
 Single purpose:
 
-> Rewrite user-provided drafts into clear English inside a browser side panel, using a user-configured OpenRouter model.
+> Improve user-provided drafts in the user's chosen language inside a browser side panel, using a user-configured OpenRouter model.
 
 Permission justifications:
 
@@ -72,13 +72,13 @@ Drafts/context may contain personal communications or other information the user
 
 Suggested instructions:
 
-> 1. Click the X Draft toolbar icon to open its side panel.
+> 1. Click the OwnWords toolbar icon to open its side panel.
 > 2. Enter a working OpenRouter API key. Choose an available text model or enter a custom OpenRouter model ID. Save settings.
 > 3. Paste “I not sure this is what people need.” into the draft box.
-> 4. Select Natural and click Generate. An English rewrite appears below.
+> 4. Select English as the output language, select Natural, and click Rewrite draft. An English rewrite appears below. Interface and output languages can be changed independently.
 > 5. Edit or copy the result. Reopen Settings to change the model or remove the key.
 >
-> No X login is needed, and the extension works beside any page. API usage requires an OpenRouter account with access to the selected model. The extension does not include bundled service credentials.
+> No website login is needed, and the extension works beside any page. An original draft is required; the extension does not invent replies from an empty editor. API usage requires an OpenRouter account with access to the selected model. The extension does not include bundled service credentials.
 
 If Google requires test access, arrange a dedicated, limited-budget review key through the dashboard's private reviewer instructions. Never place credentials in the public listing, repository, screenshots, or package. Follow the reviewer's current access requirements.
 

@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>X Draft</title>
+  <title>OwnWords</title>
   <link rel="icon" href="icons/48.png">
   <link rel="stylesheet" href="src/panel.css">
   <script type="module" src="src/panel.js"></script>
@@ -11,55 +11,61 @@
 <body>
   <main class="app">
     <header class="header">
-      <a class="brand" href="#" aria-label="X Draft 首页"><span class="brand-mark" aria-hidden="true">xd.</span><span>X Draft</span></a>
-      <button id="settings-toggle" class="text-button" aria-expanded="false" aria-controls="settings">设置</button>
+      <a class="brand" href="#" aria-label="OwnWords home" data-i18n-aria-label="home"><span class="brand-mark" aria-hidden="true">ow.</span><span>OwnWords</span></a>
+      <div class="header-actions">
+        <label for="ui-language" class="sr-only" data-i18n="uiLanguage">Interface language</label>
+        <select id="ui-language" disabled></select>
+        <button id="settings-toggle" class="text-button" aria-expanded="false" aria-controls="settings" data-i18n="settings">Settings</button>
+      </div>
     </header>
 
     <section id="settings" class="settings" aria-labelledby="settings-title" hidden>
-      <div class="section-top"><h2 id="settings-title">连接 OpenRouter</h2><span class="small">只需设置一次</span></div>
-      <form id="settings-form">
-        <label for="api-key">API Key</label>
-        <div class="key-field"><input id="api-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-or-…" required><button type="button" id="key-toggle" class="text-button" aria-label="显示 API Key">显示</button></div>
-        <label for="model-preset">模型</label>
-        <select id="model-preset"><option value="anthropic/claude-haiku-5.5">Claude Haiku 5.5</option><option value="openai/gpt-6-luna">GPT-6 Luna</option><option value="custom">自定义模型</option></select>
-        <label id="model-label" for="model" hidden>模型 ID</label>
+      <div class="section-top"><h2 id="settings-title" data-i18n="connect">Connect OpenRouter</h2><span class="small" data-i18n="setupOnce">Set up once</span></div>
+      <form id="settings-form" novalidate>
+        <label for="api-key" data-i18n="apiKey">API key</label>
+        <div class="key-field"><input id="api-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-or-…" required><button type="button" id="key-toggle" class="text-button" aria-label="Show API key">Show</button></div>
+        <label for="model-preset" data-i18n="model">Model</label>
+        <select id="model-preset"><option value="anthropic/claude-haiku-5.5">Claude Haiku 5.5</option><option value="openai/gpt-6-luna">GPT-6 Luna</option><option value="custom" data-i18n="customModel">Custom model</option></select>
+        <label id="model-label" for="model" data-i18n="modelId" hidden>Model ID</label>
         <input id="model" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="provider/model-name" maxlength="200" aria-describedby="model-help" hidden>
-        <p id="model-help" class="small">从 <a href="https://openrouter.ai/models" target="_blank" rel="noreferrer">OpenRouter 模型页</a>复制完整 ID，可随时更换。</p>
-        <div class="settings-actions"><button type="submit" class="primary">保存设置</button><button type="button" id="forget-key" class="text-button danger">移除 Key</button></div>
-        <p class="privacy small">Key 仅保存在此浏览器本地，未加密。生成时，初稿和上下文会直接发给 OpenRouter 及模型提供方。</p>
+        <p id="model-help" class="small"><span data-i18n="modelHelp">Copy the full model ID. You can change it anytime.</span> <a href="https://openrouter.ai/models" target="_blank" rel="noreferrer" data-i18n="modelCatalog">Browse OpenRouter models</a></p>
+        <div class="settings-actions"><button type="submit" class="primary" data-i18n="saveSettings">Save settings</button><button type="button" id="forget-key" class="text-button danger" data-i18n="removeKey">Remove key</button></div>
+        <p class="privacy small" data-i18n="privacyDisclosure">Your key stays in this browser, unencrypted. When you rewrite, your draft and context go directly to OpenRouter and the model provider.</p>
       </form>
     </section>
 
-    <div class="intro"><h1>想说的，自然地说出来。</h1><p class="intro-copy">贴上初稿，留住你的语气。中英混写也没关系。</p></div>
+    <div class="intro"><h1 data-i18n="headline">Your words. Made clearer.</h1><p class="intro-copy" data-i18n="subtitle">Start with your own draft. Keep your meaning, in any conversation.</p></div>
 
-    <form id="rewrite-form">
+    <form id="rewrite-form" novalidate>
       <section class="draft-section" aria-labelledby="draft-label">
-        <div class="section-top"><label id="draft-label" for="draft">你的初稿</label><button type="button" id="clear" class="text-button">清空</button></div>
-        <textarea id="draft" rows="7" maxlength="8000" placeholder="I think the hardest part of building something is not coding, is figuring out if people really need it." aria-describedby="draft-hint" required></textarea>
-        <div class="field-footer"><span id="draft-hint">英文、中文，或者混着写</span><span id="draft-count">0 / 8,000</span></div>
+        <div class="section-top"><label id="draft-label" for="draft" data-i18n="draftLabel">Your draft</label><button type="button" id="clear" class="text-button" data-i18n="clear">Clear</button></div>
+        <textarea id="draft" dir="auto" rows="7" maxlength="8000" data-i18n-placeholder="draftPlaceholder" aria-describedby="draft-hint" required></textarea>
+        <div class="field-footer"><span id="draft-hint" data-i18n="draftHint">Any language, or a mix</span><span id="draft-count">0 / 8,000</span></div>
       </section>
 
-      <fieldset class="styles"><legend>怎么改？</legend><div class="style-options">
-        <label><input type="radio" name="style" value="natural" checked><span>自然一点</span></label>
-        <label><input type="radio" name="style" value="concise"><span>更简短</span></label>
-        <label><input type="radio" name="style" value="grammar"><span>只改语法</span></label>
+      <div class="output-language-row"><label for="output-language" data-i18n="outputLanguage">Output language</label><select id="output-language" disabled></select></div>
+
+      <fieldset class="styles"><legend data-i18n="styleLabel">How much should change?</legend><div class="style-options">
+        <label><input type="radio" name="style" value="natural" checked><span data-i18n="styleNatural">Natural</span></label>
+        <label><input type="radio" name="style" value="concise"><span data-i18n="styleConcise">Concise</span></label>
+        <label><input type="radio" name="style" value="grammar"><span data-i18n="styleGrammar">Grammar only</span></label>
       </div></fieldset>
 
-      <details id="context-details"><summary>补充上下文<span class="small">可选</span></summary><label class="small context-label" for="context">你在回复什么？粘贴原帖，帮助理解你的意思。</label><textarea id="context" rows="3" maxlength="4000" placeholder="粘贴对方的原话…"></textarea></details>
+      <details id="context-details"><summary><span data-i18n="contextSummary">Add context</span><span class="small" data-i18n="optional">Optional</span></summary><label class="small context-label" for="context" data-i18n="contextLabel">What are you replying to? Paste the original text to help interpret your draft.</label><textarea id="context" dir="auto" rows="3" maxlength="4000" data-i18n-placeholder="contextPlaceholder"></textarea></details>
 
-      <div class="generate-row"><button type="submit" id="generate" class="primary generate"><span id="generate-label">改成自然英文</span></button><button type="button" id="cancel" class="secondary" hidden>取消</button></div>
-      <p class="shortcut"><kbd id="shortcut-modifier">⌘</kbd> <kbd>Enter</kbd> 生成</p>
+      <div class="generate-row"><button type="submit" id="generate" class="primary generate"><span id="generate-label">Rewrite draft</span></button><button type="button" id="cancel" class="secondary" data-i18n="cancel" hidden>Cancel</button></div>
+      <p class="shortcut"><kbd id="shortcut-modifier">⌘</kbd> <kbd>Enter</kbd> <span data-i18n="shortcutAction">to rewrite</span></p>
     </form>
 
     <p id="status" role="status" aria-live="polite" hidden></p>
     <section id="result-section" class="result-section" aria-labelledby="result-label">
-      <div class="section-top"><label id="result-label" for="result">你的英文表达</label><button type="button" id="copy" class="text-button" disabled>复制</button></div>
-      <div id="empty-result" class="empty-result"><span aria-hidden="true">Aa</span><p>你的意思，更清楚一点。</p><p class="small">生成后的英文会出现在这里。</p></div>
-      <textarea id="result" rows="6" aria-label="改写结果，可继续编辑" hidden></textarea>
-      <div id="result-meta" class="result-meta" hidden><span>可直接编辑后复制</span><span id="result-count"></span></div>
-      <p id="stale-note" class="small" hidden>初稿或改写方式已更改。这里还是上一次的结果。</p>
+      <div class="section-top"><label id="result-label" for="result" data-i18n="resultLabel">Your rewrite</label><button type="button" id="copy" class="text-button" disabled>Copy</button></div>
+      <div id="empty-result" class="empty-result"><span aria-hidden="true">Aa</span><p data-i18n="emptyTitle">Your meaning, a little clearer.</p><p class="small" data-i18n="emptyHint">Your rewrite will appear here.</p></div>
+      <textarea id="result" dir="auto" rows="6" aria-label="Rewritten text, editable" data-i18n-aria-label="resultAria" hidden></textarea>
+      <div id="result-meta" class="result-meta" hidden><span data-i18n="resultMeta">Edit before copying</span><span id="result-count"></span></div>
+      <p id="stale-note" class="small" data-i18n="staleNote" hidden>Your draft, style, or output language changed. This is still the previous result.</p>
     </section>
-    <footer><a href="https://github.com/Michaellzd/x-draft/blob/main/PRIVACY.md" target="_blank" rel="noreferrer">隐私说明</a><span id="model-status">尚未连接</span></footer>
+    <footer><a href="https://github.com/Michaellzd/ownwords/blob/main/PRIVACY.md" target="_blank" rel="noreferrer" data-i18n="privacy">Privacy</a><span id="model-status">Not connected</span></footer>
   </main>
 </body>
 </html>
