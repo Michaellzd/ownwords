@@ -19,7 +19,7 @@ npm run test:browser
 npm run package
 ```
 
-Upload `dist/ownwords-0.2.0.zip`. `manifest.json` is at the ZIP root. The archive contains runtime files, all language packs, and the license. Do not upload `.git`, `node_modules`, browser profiles, tests, screenshots containing keys, or environment files.
+Upload `dist/ownwords-0.2.0.zip`. `manifest.json` is at the ZIP root. The archive contains runtime files, all language packs, the license, and `START-HERE.txt`. The identical `ownwords-chrome.zip` is distributed to users through GitHub Releases. Do not upload `.git`, `node_modules`, browser profiles, tests, screenshots containing keys, or environment files.
 
 Before submission, do one live rewrite with your own key for each preset you intend to advertise. Automated tests mock responses and do not verify current model access, billing, response quality, or service availability. Remove your key before capturing screenshots.
 

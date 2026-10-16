@@ -1,0 +1,62 @@
+OwnWords — Your own thoughts. Expressed clearly.
+
+You do not need to code or install any developer tools.
+
+INSTALL IN CHROME
+
+1. Extract this ZIP first. On Windows, right-click it and choose Extract All.
+   On macOS, double-click the ZIP.
+2. Move the extracted folder somewhere you will keep it, such as Documents.
+   Do not delete this folder after installation: Chrome needs its files.
+3. In Chrome's address bar, type chrome://extensions and press Enter.
+4. Turn on Developer mode at the top right.
+5. Click Load unpacked and select the folder containing manifest.json.
+   Choose the extracted folder, not the ZIP file.
+6. Click Chrome's Extensions menu (the puzzle-piece button). Pin OwnWords,
+   then click the OwnWords icon to open the editor beside your current page.
+
+In Microsoft Edge, use edge://extensions instead of chrome://extensions.
+Chrome 116 or newer is the tested target. Firefox, Safari, and mobile browsers
+are not supported by this download. This is a manual installation, not a
+Chrome Web Store installation.
+
+SET UP YOUR MODEL
+
+1. Sign in to OpenRouter at https://openrouter.ai/settings/keys and create
+   your own API key. Never share this key in a public issue or screenshot.
+2. Open OwnWords Settings and paste the key.
+3. Pick Claude Haiku 5.5 or GPT-6 Luna, or choose Custom model and enter
+   another full OpenRouter model ID. Click Save settings.
+
+OwnWords is free to download. Model requests use your OpenRouter account
+and may incur API charges. Your key and model are editable at any time.
+The key is saved only in this browser profile and is not encrypted.
+
+USE OWNWORDS
+
+Write your own draft first, in any language or a mixture. Select the output
+language and Natural, Concise, or Grammar only. Optionally add the original
+comment or message as context, then rewrite. Read the result, edit if needed,
+and copy it into your conversation. OwnWords does not post for you.
+
+The language picker in the header changes the interface. The Output language
+picker changes the result. Both support English, Simplified Chinese, Japanese,
+Korean, and Spanish. Changing the interface does not change your output choice.
+
+UPDATE
+
+This manual installation does not update automatically. Download the latest
+ownwords-chrome.zip from https://github.com/Michaellzd/ownwords/releases/latest
+and extract it. Copy the new files into the SAME installed folder, replacing
+the old files. Then open chrome://extensions and click Reload on OwnWords.
+Keep the same folder path to retain your saved settings. Copy any unfinished
+draft somewhere safe before reloading; reloading clears session-only text.
+
+HELP
+
+Full guide: https://github.com/Michaellzd/ownwords/blob/main/docs/install.md
+Privacy: https://github.com/Michaellzd/ownwords/blob/main/PRIVACY.md
+Report a problem: https://github.com/Michaellzd/ownwords/issues
+Follow Michael: https://x.com/michael_lu_03
+
+Do not include API keys or private drafts in public reports.

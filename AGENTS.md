@@ -78,8 +78,12 @@ Run checks appropriate to the change. For UI or persistence changes, run browser
 
 The ZIP uses an explicit file allowlist in `scripts/package.mjs`; update it if adding a runtime asset. Inspect for secrets before committing or publishing. Keep `README.md`, `PRIVACY.md`, and the store guide consistent with shipped behavior.
 
+For a downloadable release, run `npm run test:package`. It rebuilds, inspects, extracts, and loads the ZIP in an isolated browser rather than testing only the source directory. Preserve the stable download asset name `ownwords-chrome.zip`, which the README links through GitHub's latest-release URL. Include `START-HERE.txt` and keep the nontechnical installation guide current. Users must not need Git, Node.js, or terminal commands to install the release package.
+
 ## GitHub and releases
 
 This is a standalone public repository. Keep commits scoped to this folder; the parent workspace contains unrelated projects. Do not change its Git configuration or stage its files.
 
 Publishing source to GitHub is separate from submitting an extension to the Chrome Web Store. Store submissions, changes to visibility, and releases should follow the user's stated scope. Do not imply store approval or promise review timing.
+
+When a release is requested, publish its ZIP as an explicit GitHub Release asset, tag the exact tested source commit, and write installation instructions in the release notes. Do not direct everyday users to the auto-generated source archives. Explain that ZIP installation uses Developer mode and Load unpacked, has manual updates, and is distinct from a Chrome Web Store installation.

@@ -6,6 +6,26 @@ A small Chrome / Edge side-panel extension for replies, comments, posts, and mes
 
 Bring your own **OpenRouter API key** and **model ID**. Both are editable. There is no account system, subscription, or application server.
 
+## Download and install
+
+### [Download OwnWords for Chrome / Edge](https://github.com/Michaellzd/ownwords/releases/latest/download/ownwords-chrome.zip)
+
+**No coding, Git, Node.js, or terminal commands needed.** Download the ZIP above, or visit [the latest release](https://github.com/Michaellzd/ownwords/releases/latest) and choose **`ownwords-chrome.zip`** under Assets. The automatically listed source-code downloads are for developers.
+
+1. **Unzip the download.** On Windows, right-click the ZIP and choose **Extract All**. On macOS, double-click it.
+2. **Keep the extracted folder somewhere permanent**, such as Documents. Chrome needs these files to keep the extension working.
+3. In Chrome's address bar, type **`chrome://extensions`** and press Enter.
+4. Turn on **Developer mode** at the top right, then click **Load unpacked**.
+5. Choose the extracted folder **containing `manifest.json`**. Select the folder, not the ZIP file.
+6. Click Chrome's **Extensions** menu (the puzzle-piece button), pin **OwnWords**, then click its icon.
+7. Enter your [OpenRouter API key](https://openrouter.ai/settings/keys), choose a model, and click **Save settings**. Your interface may follow your browser's language; use the language picker to change it.
+
+You can now write your own draft, select the output language, and rewrite. OwnWords is free to download; model requests use your OpenRouter account and may incur API charges.
+
+For Edge, use **`edge://extensions`** in step 3. Chrome 116+ is the tested target; other Chromium browsers may implement side panels differently. Firefox, Safari, and mobile browsers are not supported by this package.
+
+OwnWords is not yet on the Chrome Web Store, so this download uses Chrome's manual **Load unpacked** installation. See [Google's installation instructions](https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world#load-unpacked) or our [step-by-step installation, setup, and update guide](docs/install.md). A plain-text guide, **`START-HERE.txt`**, is also included in the download.
+
 ## Why your draft comes first
 
 OwnWords started with a personal need: I am not a native English speaker, but I often communicate in English on X. I wanted help making my wording clear without repeatedly opening ChatGPT or Claude.
@@ -13,19 +33,6 @@ OwnWords started with a personal need: I am not a native English speaker, but I 
 The need goes beyond X and English. People write comments, replies, and messages on many websites, in many languages. The important part is that **the thought starts with you**. Your first version holds your meaning, even when its grammar is rough or its languages are mixed. AI should help express that meaning, while preserving your point of view, uncertainty, and personality.
 
 OwnWords edits your draft. It does not generate replies from an empty box, invent your opinions or experiences, or publish anything. You review the result and decide what to use. The [product principles in AGENTS.md](AGENTS.md#product) guide future development.
-
-## Try it locally
-
-1. Clone this repository, or download and unzip it.
-2. Open `chrome://extensions` in Chrome (116 or newer).
-3. Enable **Developer mode**.
-4. Click **Load unpacked** and select the `ownwords` folder containing `manifest.json`.
-5. Pin **OwnWords** in the browser toolbar, then click its icon to open the side panel.
-6. Enter your OpenRouter key, choose a model, and save.
-
-For Edge, load the same folder through `edge://extensions`. Chrome is the tested target; other Chromium browsers may implement side panels differently. Firefox and Safari are not supported by this manifest.
-
-**No build or npm install is needed to use the extension.**
 
 ## Write and rewrite
 
@@ -94,9 +101,12 @@ npm run check
 npx playwright install chromium
 npm run test:browser
 npm run package
+npm run test:package
 ```
 
-`npm run test:browser` loads the real unpacked extension in an isolated Chromium profile and mocks only OpenRouter responses. It covers settings, custom models, language independence/persistence, rewriting, localized errors, cancellation, clipboard, stale results, session recovery, and narrow layouts in all five languages. It does not use real API credits. `npm run package` creates `dist/ownwords-0.2.0.zip` from an explicit runtime-file allowlist, including all translation files.
+`npm run test:browser` loads the real unpacked extension in an isolated Chromium profile and mocks only OpenRouter responses. It covers settings, custom models, language independence/persistence, rewriting, localized errors, cancellation, clipboard, stale results, session recovery, and narrow layouts in all five languages. It does not use real API credits.
+
+`npm run package` creates a versioned ZIP such as `dist/ownwords-0.2.0.zip` plus the identical `dist/ownwords-chrome.zip` download from an explicit file allowlist. Both include the runtime, all translations, and the installation guide. `npm run test:package` rebuilds, inspects, extracts, and runs the browser tests against the packaged extension. Contributors can also load this source folder directly through **Load unpacked**, with no build step.
 
 The runtime is plain HTML, CSS, and JavaScript with no third-party runtime dependencies, remote scripts, or build pipeline. Playwright is a development dependency only.
 

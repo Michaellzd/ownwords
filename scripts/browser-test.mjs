@@ -8,11 +8,12 @@ import { LANGUAGES } from '../src/languages.js';
 import { translate } from '../src/i18n.js';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
+const extensionRoot = path.resolve(root, process.argv[2] || '.');
 const profile = await mkdtemp(path.join(tmpdir(), 'ownwords-test-'));
 await mkdir(path.join(root, 'artifacts'), { recursive: true });
 const context = await chromium.launchPersistentContext(profile, {
   channel: 'chromium', headless: true,
-  args: [`--disable-extensions-except=${root}`, `--load-extension=${root}`],
+  args: [`--disable-extensions-except=${extensionRoot}`, `--load-extension=${extensionRoot}`],
   viewport: { width: 400, height: 900 },
   locale: 'zh-CN',
 });
